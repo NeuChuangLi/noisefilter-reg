@@ -1,0 +1,36 @@
+illustration:
+1. syntheticdata.m is used to generate UR, IFR, G-means and F1-score on synthetic dataset
+
+2. GandF is used to generate G-means and F1-score on regression datasets
+alter row 52: Y(randind(s))=rand; to Y(randind(s))=sqrt(0.5)*randn; then the noise type is Gaussian noise
+
+3. URandIFR is used to generate UR and IFR on regression datasets
+alter row 63: Y(randind(s))=sqrt(0.5)*randn; to Y(randind(s))=rand; then the noise type is Uniform noise
+
+4. autoexecute helps to generate the average accuracy and statistical test
+the output KNNoutput, RFoutput, BPoutput are average results, and outputcell is used as input of dealccscell
+Gotten the output of dealccscell, you can use the following code to generate rank of alined friedman test
+
+[averank] = matrixrank(RMSEmatrix)
+RMSEmatrix=[1 2 3 4 5 6 7;RMSEmatrix];
+xlswrite('RMSE1.xlsx',RMSEmatrix);
+
+Then feed RMSE1.xlsx to Rstudio to conduct the aline friedman test and holm test.
+You will use the library scmamp and xlsx.
+Note that, dealccscell(outputcell, 1,1) give the output of KNN and 10% noise level, similarly, dealccscell(outputcell, 2,3) give the output of RF and 30% noise level
+and dealccscell(outputcell, 3,5) give the output of BP under 50% noise level
+
+If you want to change the noise type, please alter the row 20 in noisefiltercompare.m
+
+5. wilcox.m is used to conduct wilcoxon test. Given the outputs, you can use the following code to generate the test result.
+
+s=zeros(22,2);
+for i=1:1:22
+s(i,1)=KNNCELL{i,1}(1);
+s(i,2)=KNNCELL{i,1}(2);
+end
+[p,h]=ranksum(s(:,1),s(:,2),0.1)
+mean(s)
+
+Similarly, KNNCELL{i,1} can be altered by RFCELL{i,2} or BPCELL{i,5} to get the results of RF or BP on 20% or 50% noise level.
+If you want to change the noise type, please alter the row 70 in wilcox.m
